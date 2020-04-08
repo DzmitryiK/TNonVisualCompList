@@ -59,5 +59,3 @@ TNonVisualCompList Stored property stores groups and original Left property valu
 - [ ] Other Delphi and C++ Builder packages
 - [ ] Speeding up refreshing with 500+ components to show
 - [ ] More aligning options
-
-### License
