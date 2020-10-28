@@ -1,0 +1,43 @@
+{ $REV 23.05.2013 12:38:01 Обновление}
+package NonVisualCompList;
+
+{$R *.res}
+{$R 'TNonVisualCompList.dcr'}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'Nonvisual component list'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  vcl,
+  designide,
+  vclx,
+  vcljpg;
+
+contains
+  frmCList in '..\..\Source\frmCList.pas' {CListForm},
+  nvclComponent in '..\..\Source\nvclComponent.pas',
+  nvclEditors in '..\..\Source\nvclEditors.pas';
+
+end.

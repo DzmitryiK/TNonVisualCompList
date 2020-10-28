@@ -4,7 +4,7 @@ interface
 
 uses
   SysUtils, Classes, IniFiles, StrUtils, Windows, Controls, Dialogs, ClipBrd,
-  Forms, Messages, vcl.stdctrls;
+  Forms, Messages, {$IFDEF Delphi2007_up}vcl.{$ENDIF}stdctrls;
 
 type
 
@@ -74,7 +74,9 @@ procedure SetNonVisualPos(Form: TWinControl; Component: TComponent; X, Y: Intege
 
 implementation
 
+{$IFDEF Delphi2007_up}
 {$REGION 'Designer methods'}
+{$ENDIF}		
 
 {Return True if wHandle is of TContainer}
 function HWndIsNonvisualComponent(wHandle: THandle): Boolean;
@@ -359,9 +361,13 @@ begin
     md.MarkModified;
 end;          }
 
+{$IFDEF Delphi2007_up}
 {$ENDREGION}
+{$ENDIF}	
 
+{$IFDEF Delphi2007_up}
 {$REGION 'TNonVisualCompList'}
+{$ENDIF}		
 
 procedure TNonVisualCompList.AddInGroup(const GroupName: string; Cmp: TComponent);
 var
@@ -786,7 +792,9 @@ begin
   end;
 end;
 
+{$IFDEF Delphi2007_up}
 {$ENDREGION}
+{$ENDIF}		
 
 end.
 

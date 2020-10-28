@@ -1,2 +1,6 @@
+v.1.1 (28.10.2020)
+-Delphi 7 package
+-Updated mechanism for component icon loading
+
 v.1.0 (08.04.2020)
 First stable release

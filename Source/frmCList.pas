@@ -6,7 +6,7 @@ uses
   SysUtils, Classes, Controls, Forms, StrUtils, Windows, Graphics,
   ExtCtrls, ToolsAPI, StdCtrls, Registry, ComCtrls, ActnList, Dialogs,
   Menus, DesignEditors, DesignIntf, typinfo, ImgList, ToolWin,
-  nvclComponent, System.Actions, DesignWindows;
+  nvclComponent, {$IFDEF Delphi2007_up}System.Actions,{$ENDIF} DesignWindows;
 
 type
   TCListForm=class(TDesignWindow, IDesignNotification)
@@ -35,7 +35,6 @@ type
     btnRefresh: TToolButton;
     tvCList: TTreeView;
     cbeCompFilter: TComboBoxEx;
-    Image1: TImage;
     pnFilter: TPanel;
     imgFilter: TImage;
     ActionList1: TActionList;
@@ -60,6 +59,7 @@ type
     tbtnSort: TToolButton;
     acSort: TAction;
     StatusBar1: TStatusBar;
+	Panel1: TPanel;		   
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure edtSearchChange(Sender: TObject);
@@ -136,10 +136,12 @@ var
 type
   TCListFormClass=class of TCListForm;
 
+  {$IFDEF Delphi2007_up}								  
   TString_Helper=class helper for TStrings
   public
     function IndexOfText(const s: string): integer;
   end;
+  {$ENDIF}												   
 
   TAddTreeNode=class(TTreeNode)
   private
@@ -227,7 +229,7 @@ var
         tkInteger,
           tkClass: Result := IntToStr(GetOrdProp(Sender, p));
         tkLString,
-          tkWString, tkUString,
+          tkWString, {$IFDEF Delphi2007_up} tkUString, {$ENDIF}
           tkString: Result := GetStrProp(Sender, p);
         tkEnumeration:
           Result := IntToStr(GETENUMValue(PPropInfo(p)^.PropType^,
@@ -257,7 +259,7 @@ var
     Result := 0;
     if AComponent=nil then Exit;
 
-    Result := slCompName.IndexOfText(AComponent.ClassName);
+    Result := slCompName.IndexOf(AComponent.ClassName);//slCompName.IndexOfText(AComponent.ClassName);
     if Result>=0 then
       Result := integer(slCompName.Objects[Result])
     else
@@ -369,9 +371,9 @@ begin
           lstGroups.Items.Assign(TNonVisualCompList(c).Groups);
           for j := 0 to lstGroups.Items.Count-1 do
           begin
-            if lstGroups.Items[j].CompareTo(_HidedGroupName) = 0 then
+            if CompareText(lstGroups.Items[j], _HidedGroupName) = 0 then
             begin
-              lstGroups.Items.Delete(j);
+              lstGroups.Items.Delete(j);  
               break;
             end;
           end;
@@ -574,7 +576,12 @@ begin
     end;
 
     NonVisualCompList.RenameGroup(lstGroups.Items[lstGroups.ItemIndex], Value);
-    FormActivate(Sender);
+   // FormActivate(Sender);
+    if Value<>sGroupFilter then
+    begin
+      sGroupFilter := Value;
+      FormActivate(Sender);
+    end;
     MarkModified;
 
   end;
@@ -985,6 +992,12 @@ begin
     tvCanv.Font.Style := tvCanv.Font.Style + [fsItalic];
     tvCanv.TextOut(txtRect.Left, txtRect.Top, TAddTreeNode(Node).AddText);
     tvCanv.Font.Style := tvCanv.Font.Style - [fsItalic];
+  end
+  else
+  begin
+    //D7 bug - when not doing that nodes with other levels will be with larger font
+    tvCanv.Font.Style := tvCanv.Font.Style + [fsItalic];
+    tvCanv.Font.Style := tvCanv.Font.Style - [fsItalic];
   end;
 end;
 
@@ -1303,28 +1316,109 @@ procedure TCListForm.LoadBitmapFromPackage;
 var
   n, i, j: integer;
   PackageHandle: Thandle;
-  Bitmap, bmp16
-    : TBitmap;
+  Bitmap, bmp16: TBitmap;
+			  
   s: string;
   ps: IOTAPackageServices;
   CL: TClass;
+  ISL: TSTringList;
+  imALL: TImageList;
 
-  //Redrawing icon background(color MaskColor) to NewMaskColor pixel by pixel
+  //Redrawing icon background(color MaskColor) to NewMaskColor
   procedure ChangeBMPbackground(abmp:TBitmap; MaskColor, NewMaskColor:Integer);
-    var i, j:integer;
+    var y, x:integer;
+    scanline: PRGBTriple;
+    Color: Longint; 
+    r, g, b: Byte;
   begin
-    for I := 0 to abmp.Width do
-       for j := 0 to abmp.Height do
-        if Bitmap.Canvas.Pixels[i,j] = MaskColor then
-          Bitmap.Canvas.Pixels[i,j] := NewMaskColor;
+    abmp.PixelFormat := pf24bit ;
+    Color := ColorToRGB(MaskColor);
+    r := Color;
+    g := Color shr 8;
+    b := Color shr 16;
+    for y := 0 to abmp.Height - 1 do
+    begin
+      scanline := abmp.ScanLine[y];
+      for x := 0 to abmp.Width - 1 do
+      begin
+        with scanline^ do
+        begin
+          if (rgbtBlue = b) and (rgbtGreen = g) and (rgbtRed = r) then
+            FillChar(scanline^, sizeof(TRGBTriple), NewMaskColor);
+        end;
+        inc(scanline);
+      end;
+    end;
+  end;
+
+  //Getting all resource names from hModule to list
+  function EnumResNameProc(hModule: THandle; lpszType: PAnsiChar; lpszName: Pointer;
+            list: TStrings): BOOL; stdcall;
+  var k:integer;
+      ss:string;
+  begin
+    ss := PChar(lpszName);
+    k := list.IndexOf(ss);//slCompName.IndexOfText(s);
+    if k<0 then
+    begin
+      list.Add(PChar(lpszName));
+    end;
+    Result := True;
   end;
 
 begin
   ps := BorlandIDEServices as IOTAPackageServices;
+
+  ISL := TStringList.Create;  
+
+  imALL := TImageList.Create(self);
+  imALL.Width := 16; imALL.Height := 16;
+  imALL.AllocBy := 4;
+
+  //Getting all bitmaps from all packages for coponents into temporary imagelist
   for i := 0 to Pred(ps.PackageCount) do
     if ps.ComponentCount[i]>0 then
     begin
-      PackageHandle := GetModuleHandle(PChar(Uppercase(ps.PackageNames[i])));
+      PackageHandle := GetModuleHandle(PChar(Uppercase(ps.PackageNames[i]{$IF CompilerVersion <= 18}+'.bpl'{$IFEND})));
+      if PackageHandle<>0 then
+      begin
+        n := ISL.count;
+        //Getting all Bitmap names from package
+        EnumResourceNames(PackageHandle,RT_BITMAP,@EnumResNameProc,Integer(ISL));
+        for j := n to ISL.count -1 do
+        begin
+          Bitmap := TBitmap.Create;
+          bmp16 := TBitmap.Create;
+          bmp16.Width := 16; bmp16.height := 16;
+
+          //Loading icon from package, changing BG to white, stretching to 16x16,
+          // adding into temp ImageList
+          Bitmap.LoadFromResourceName(PackageHandle, ISL[j]);
+
+          ChangeBMPbackground(Bitmap, Bitmap.Canvas.Pixels[0, Bitmap.Height-1], clWhite);
+          bmp16.PixelFormat:=pf24bit;
+          SetStretchBltMode(bmp16.Canvas.Handle,HALFTONE);
+          StretchBlt(bmp16.Canvas.Handle,
+                     0, 0,
+                     16, 16,
+                     Bitmap.Canvas.Handle,
+                     0, 0,
+                     Bitmap.Width, Bitmap.Height,
+                     SRCCOPY );
+          //bmp16.SaveToFile('C:\icons\'+ISL[j]+'.bmp');
+          imALL.Add(bmp16, nil);
+
+          Bitmap.Free;
+          bmp16.Free;
+        end;
+      end;
+    end;
+
+  //Selecting images for components and loading into ilVST
+  for i := 0 to Pred(ps.PackageCount) do
+    if ps.ComponentCount[i]>0 then
+    begin
+      PackageHandle := GetModuleHandle(PChar(Uppercase(ps.PackageNames[i]{$IF CompilerVersion <= 18}+'.bpl'{$IFEND})));
       if PackageHandle<>0 then
         for j := 0 to Pred(ps.ComponentCount[i]) do
         begin
@@ -1332,13 +1426,13 @@ begin
           if (cl<>nil) then
           begin
             s := ps.ComponentNames[i, j];
-            Bitmap := TBitmap.Create;
+
             bmp16 := TBitmap.Create;
             bmp16.Width := 16;
             bmp16.height := 16;
             while True do
             try
-              n := slCompName.IndexOfText(s);
+              n := slCompName.IndexOf(s);//slCompName.IndexOfText(s);
               //if class is already loaded - breaking
               if n>=0 then
               begin
@@ -1346,20 +1440,20 @@ begin
                 Break;
               end;
 
-              //loading icon from package, changing BG to white, stretching to 16x16,
-              // adding into ilVST
-              Bitmap.LoadFromResourceName(PackageHandle, UpperCase(s));
-              ChangeBMPbackground(Bitmap, Bitmap.Canvas.Pixels[0, Bitmap.Height-1], clWhite);
-              //Bitmap.SaveToFile('D:\icons\'+s+'.bmp');
-              bmp16.PixelFormat:=pf24bit;
-              SetStretchBltMode(bmp16.Canvas.Handle,HALFTONE);
-              StretchBlt(bmp16.Canvas.Handle,
-                     0, 0,
-                     16, 16,
-                     Bitmap.Canvas.Handle,
-                     0, 0,
-                     Bitmap.Width, Bitmap.Height,
-                     SRCCOPY );
+              //Sometimes components use icons with not the same names as component
+              //For now only one exclusion found
+              if s = 'TIDMESSAGEDECODERMIME' then
+                s := 'TIDMESSAGEDECODER';
+
+              //Searching icon for component, adding into ilVST
+              n := ISL.IndexOf(s);
+              if n < 0 then break;
+              imAll.GetBitmap(n, bmp16);
+
+										  
+						  
+												 
+							   
               ilVST.AddMasked(bmp16, bmp16.Canvas.Pixels[0, bmp16.Height-1]);
               slCompName.AddObject(ps.ComponentNames[i, j], TObject(ilVST.Count-1));
               Break;
@@ -1375,7 +1469,7 @@ begin
             else
               Break;
             end;
-            Bitmap.Free;
+         //   Bitmap.Free;
             bmp16.Free;
           end;
         end;
@@ -1384,7 +1478,9 @@ begin
 end;
 
 
+{$IFDEF Delphi2007_up}
 {$REGION 'IDesignNotification'}
+{$ENDIF}					  
 
 procedure TCListForm.DesignerClosed(const ADesigner: IDesigner; AGoingDormant: Boolean);
 begin
@@ -1422,10 +1518,13 @@ begin
 
 end;
 
+{$IFDEF Delphi2007_up}
 {$ENDREGION}
+{$ENDIF}					  
 
 { TStringList_Helper }
-// Search for index of specific string in TStringList
+// Search for index of specific string in TStringList, currently not used
+{$IFDEF Delphi2007_up}					  
 function TString_Helper.IndexOfText(const s: string): integer;
 var
   i: integer;
@@ -1438,6 +1537,7 @@ begin
       Exit;
     end;
 end;
+{$ENDIF}		
 
 { TAddTreeNode }
 procedure TAddTreeNode.SetAddText(const S: string);

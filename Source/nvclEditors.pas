@@ -33,7 +33,9 @@ procedure Register;
 
 implementation
 
+{$IFDEF Delphi2007_up}
 {$REGION 'Designer methods'}
+{$ENDIF}		
 function OTAMsgServices: IOTAMessageServices;
 begin
   Result := (BorlandIDEServices as IOTAMessageServices);
@@ -157,9 +159,13 @@ begin
   if MD<>nil then
     md.MarkModified;
 end;
+{$IFDEF Delphi2007_up}
 {$ENDREGION}
+{$ENDIF}	
 
+{$IFDEF Delphi2007_up}
 {$REGION 'TNVCompListEditor'}
+{$ENDIF}		
 constructor TNVCompListEditor.Create(AComponent: TComponent;
   ADesigner: IDesigner);
 begin
@@ -201,9 +207,13 @@ function TNVCompListEditor.GetVerbCount: Integer;
 begin
   Result := 1; //Number of custom popupmenu items
 end;
+{$IFDEF Delphi2007_up}
 {$ENDREGION}
+{$ENDIF}	
 
+{$IFDEF Delphi2007_up}
 {$REGION 'TNVCompListStringsProperty'}
+{$ENDIF}	
 procedure TNVCompListStringsProperty.Edit;
 var i,j:integer;
     Dlg: TStrEditDlg;
@@ -237,8 +247,11 @@ begin
   // Editing property in editor
   Result := [paDialog];
 end;
+{$IFDEF Delphi2007_up}
 {$ENDREGION}
+{$ENDIF}	
 
+{$IFDEF Delphi2007_up}				  
 procedure RegisterSplashScreen;
 var
   AboutSvcs: IOTAAboutBoxServices;
@@ -251,6 +264,7 @@ begin
       Supports(BorlandIDEServices, IOTAAboutBoxServices, AboutSvcs) then
     AboutSvcs.AddPluginInfo(_TCompListExpert_GetName, '', ProductImage,False, '','Free');
 end;
+{$ENDIF}		
 
 procedure Register;
 begin
@@ -259,7 +273,9 @@ begin
   RegisterPropertyEditor(TypeInfo(TStrings), TNonVisualCompList, 'Stored', TNVCompListStringsProperty);
 end;
 
+{$IFDEF Delphi2007_up}					  
 initialization
  RegisterSplashScreen;
+{$ENDIF}
 
 end.

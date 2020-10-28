@@ -1,9 +1,9 @@
 object CListForm: TCListForm
   Left = 0
   Top = 0
+  Width = 518
+  Height = 402
   Caption = 'Component List'
-  ClientHeight = 337
-  ClientWidth = 441
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -95,53 +95,35 @@ object CListForm: TCListForm
   OnResize = FormResize
   OnShow = FormShow
   DesignSize = (
-    441
-    337)
+    510
+    375)
   PixelsPerInch = 96
   TextHeight = 13
   object spl1: TSplitter
     Left = 121
-    Top = 47
-    Height = 271
+    Top = 54
+    Height = 302
     OnMoved = spl1Moved
-    ExplicitLeft = 457
-    ExplicitTop = 63
-    ExplicitHeight = 290
-  end
-  object Image1: TImage
-    Left = 520
-    Top = 184
-    Width = 105
-    Height = 105
   end
   object lstGroups: TListBox
     Left = 0
-    Top = 47
+    Top = 54
     Width = 121
-    Height = 271
+    Height = 302
     Align = alLeft
     Constraints.MinWidth = 20
     DragMode = dmAutomatic
     ItemHeight = 13
-    TabOrder = 2
+    TabOrder = 1
     OnClick = lstGroupsClick
     OnDragDrop = lstGroupsDragDrop
     OnDragOver = lstGroupsDragOver
   end
-  object edtSearch: TEdit
-    Left = 0
-    Top = 26
-    Width = 441
-    Height = 21
-    Align = alTop
-    TabOrder = 1
-    OnChange = edtSearchChange
-  end
   object tlb1: TToolBar
     Left = 0
     Top = 0
-    Width = 441
-    Height = 26
+    Width = 510
+    Height = 30
     AutoSize = True
     BorderWidth = 1
     Caption = 'tlb1'
@@ -151,22 +133,22 @@ object CListForm: TCListForm
     TabOrder = 0
     object btnAddGroup: TToolButton
       Left = 0
-      Top = 0
+      Top = 2
       Action = acAddGroup
     end
     object btnRenameGroup: TToolButton
       Left = 23
-      Top = 0
+      Top = 2
       Action = acRenameGroup
     end
     object btnDelGroup: TToolButton
       Left = 46
-      Top = 0
+      Top = 2
       Action = acDelGroup
     end
     object btn1: TToolButton
       Left = 69
-      Top = 0
+      Top = 2
       Width = 8
       Caption = 'btn1'
       ImageIndex = 4
@@ -174,28 +156,28 @@ object CListForm: TCListForm
     end
     object tbtnVisible: TToolButton
       Left = 77
-      Top = 0
+      Top = 2
       Action = acHideComp
       AllowAllUp = True
     end
     object tbtnDelFromGroup: TToolButton
       Left = 100
-      Top = 0
+      Top = 2
       Action = acDelFromGroup
     end
     object tbtnSort: TToolButton
       Left = 123
-      Top = 0
+      Top = 2
       Action = acSort
     end
     object btnRefresh: TToolButton
       Left = 146
-      Top = 0
+      Top = 2
       Action = acRefresh
     end
     object btn3: TToolButton
       Left = 169
-      Top = 0
+      Top = 2
       Width = 8
       Caption = 'btn3'
       ImageIndex = 5
@@ -203,22 +185,22 @@ object CListForm: TCListForm
     end
     object tbtnAlignToLeft: TToolButton
       Left = 177
-      Top = 0
+      Top = 2
       Action = acAlignToLeft
     end
     object tbtnAlignToTop: TToolButton
       Left = 200
-      Top = 0
+      Top = 2
       Action = acAlignToTop
     end
     object tbtnDeleteComponent: TToolButton
       Left = 223
-      Top = 0
+      Top = 2
       Action = acDeleteCmp
     end
     object ToolButton4: TToolButton
       Left = 246
-      Top = 0
+      Top = 2
       Width = 8
       Caption = 'ToolButton4'
       ImageIndex = 7
@@ -226,7 +208,7 @@ object CListForm: TCListForm
     end
     object cbeCompFilter: TComboBoxEx
       Left = 254
-      Top = 0
+      Top = 2
       Width = 145
       Height = 22
       ItemsEx = <
@@ -246,17 +228,19 @@ object CListForm: TCListForm
           SelectedImageIndex = 12
         end>
       Style = csExDropDownList
+      ItemHeight = 16
       TabOrder = 0
       TabStop = False
       OnSelect = cbeCompFilterSelect
       Images = ilMain
+      DropDownCount = 8
     end
   end
   object tvCList: TTreeView
     Left = 124
-    Top = 47
-    Width = 317
-    Height = 271
+    Top = 54
+    Width = 386
+    Height = 302
     Align = alClient
     DragMode = dmAutomatic
     HideSelection = False
@@ -265,7 +249,7 @@ object CListForm: TCListForm
     MultiSelect = True
     MultiSelectStyle = [msControlSelect, msShiftSelect]
     ReadOnly = True
-    TabOrder = 3
+    TabOrder = 2
     OnAdvancedCustomDraw = tvCListAdvancedCustomDraw
     OnAdvancedCustomDrawItem = tvCListAdvancedCustomDrawItem
     OnClick = tvCListClick
@@ -275,13 +259,13 @@ object CListForm: TCListForm
   end
   object pnFilter: TPanel
     Left = 125
-    Top = 287
+    Top = 326
     Width = 30
     Height = 30
     Anchors = [akLeft, akBottom]
     BevelOuter = bvNone
     Caption = ' '
-    TabOrder = 4
+    TabOrder = 3
     Visible = False
     object imgFilter: TImage
       Left = 0
@@ -339,13 +323,12 @@ object CListForm: TCListForm
         FFFF}
       ShowHint = True
       Transparent = True
-      ExplicitLeft = 2
     end
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 318
-    Width = 441
+    Top = 356
+    Width = 510
     Height = 19
     Panels = <
       item
@@ -353,11 +336,33 @@ object CListForm: TCListForm
         Width = 50
       end>
   end
+  object Panel1: TPanel
+    Left = 0
+    Top = 30
+    Width = 510
+    Height = 24
+    Align = alTop
+    BevelOuter = bvNone
+    Caption = 'Panel1'
+    TabOrder = 5
+    DesignSize = (
+      510
+      24)
+    object edtSearch: TEdit
+      Left = 0
+      Top = 1
+      Width = 507
+      Height = 21
+      Anchors = [akLeft, akTop, akRight, akBottom]
+      TabOrder = 0
+      OnChange = edtSearchChange
+    end
+  end
   object ilMain: TImageList
     Left = 16
     Top = 52
     Bitmap = {
-      494C01010D00700C700C10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010D00740C740C10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000004000000001002000000000000040
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -893,10 +898,10 @@ object CListForm: TCListForm
       000000000000}
   end
   object ilVST: TImageList
-    Left = 92
+    Left = 96
     Top = 52
     Bitmap = {
-      494C01010200AC02AC0210001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102000800080010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1039,7 +1044,7 @@ object CListForm: TCListForm
     Left = 54
     Top = 52
     Bitmap = {
-      494C010101009009900910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010101009409940910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       00000000000000000000000000000000000000000000000000009D6F40009C6E
       40009C6E40009C6E40009C6E40009C6E40009C6E40009D6F4000000000000000
@@ -1222,8 +1227,8 @@ object CListForm: TCListForm
     Left = 16
     Top = 101
     object acAddGroup: TAction
-      Caption = #1044#1086#1073#1072#1074#1080#1090#1100' '#1075#1088#1091#1087#1087#1091
-      Hint = #1044#1086#1073#1072#1074#1080#1090#1100' '#1075#1088#1091#1087#1087#1091
+      Caption = 'Add Group'
+      Hint = 'Add Group'
       ImageIndex = 0
       OnExecute = acAddGroupExecute
     end
@@ -1234,8 +1239,8 @@ object CListForm: TCListForm
       OnExecute = acRenameGroupExecute
     end
     object acDelGroup: TAction
-      Caption = #1059#1076#1072#1083#1080#1090#1100' '#1075#1088#1091#1087#1087#1091
-      Hint = #1059#1076#1072#1083#1080#1090#1100' '#1075#1088#1091#1087#1087#1091
+      Caption = 'Delete Group'
+      Hint = 'Delete Group'
       ImageIndex = 2
       OnExecute = acDelGroupExecute
     end
@@ -1258,8 +1263,8 @@ object CListForm: TCListForm
       OnExecute = acSortExecute
     end
     object acRefresh: TAction
-      Caption = #1054#1073#1085#1086#1074#1080#1090#1100
-      Hint = #1054#1073#1085#1086#1074#1080#1090#1100
+      Caption = 'Refresh'
+      Hint = 'Refresh'
       ImageIndex = 6
       OnExecute = acRefreshExecute
     end
