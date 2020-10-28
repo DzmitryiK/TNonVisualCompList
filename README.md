@@ -54,7 +54,6 @@ TNonVisualCompList Stored property stores groups and original Left property valu
 - For now the component has only Win32 version
 
 ### Currently working on:
-- [ ] Delphi 7 package testing
 - [ ] Frames handling
 - [ ] Other Delphi and C++ Builder packages
 - [ ] Speeding up refreshing with 500+ components to show
